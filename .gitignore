@@ -173,5 +173,4 @@ cython_debug/
 *.twd
 *.pyc
 __pycache__
-config.py
 .DS_Store

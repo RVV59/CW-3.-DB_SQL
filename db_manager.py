@@ -73,6 +73,7 @@ class DBManager:
                 "url": row[4]
             } for row in cursor.fetchall()]
 
+
     def get_vacancies_with_keyword(self, keyword: str) -> List[Dict[str, Any]]:
         """Получает вакансии с ключевым словом в названии."""
         with self.conn.cursor() as cursor:

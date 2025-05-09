@@ -14,7 +14,7 @@ def get_employer_vacancies(employer_id):
     vacancies = []
     page = 0
     max_vacancies = 100
-    per_page = 100  # максимум на страницу
+    per_page = 100
 
     while len(vacancies) < max_vacancies:
         url = "https://api.hh.ru/vacancies"
