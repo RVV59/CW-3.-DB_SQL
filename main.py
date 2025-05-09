@@ -1,8 +1,10 @@
 import os
+
 import psycopg2
+
 from config import DB_CONFIG, EMPLOYER_IDS
-from hh_api import get_employer_info, get_employer_vacancies
 from db_manager import DBManager
+from hh_api import get_employer_info, get_employer_vacancies
 
 
 def create_database():
