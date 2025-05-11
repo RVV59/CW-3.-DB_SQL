@@ -116,8 +116,10 @@ def display_vacancies_with_higher_salary(vacancies):
     """Отображает вакансии с зарплатой выше средней."""
     print("\nВакансии с зарплатой выше средней:")
     for idx, vacancy in enumerate(vacancies, 1):
-        avg = (vacancy["salary_from"] + vacancy["salary_to"]) / 2 if vacancy["salary_from"] and vacancy[
-            "salary_to"] else 0
+        avg = (vacancy["salary_from"] + vacancy["salary_to"]) / 2 \
+            if vacancy["salary_from"] and vacancy[
+            "salary_to"] \
+            else 0
         print(f"{idx}. {vacancy['company']} - {vacancy['vacancy']} - {avg:.0f} руб. - {vacancy['url']}")
 
 
