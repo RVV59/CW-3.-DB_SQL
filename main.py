@@ -1,5 +1,3 @@
-import os
-
 import psycopg2
 
 from config import DB_CONFIG, EMPLOYER_IDS
@@ -81,8 +79,13 @@ def fill_tables():
                     cursor.execute(
                         """INSERT INTO vacancies (employer_id, name, salary_from, salary_to, url)
                            VALUES (%s, %s, %s, %s, %s)""",
-                        (vacancy["employer_id"], vacancy["name"],
-                         vacancy["salary_from"], vacancy["salary_to"], vacancy["url"])
+                        (
+                            vacancy["employer_id"],
+                            vacancy["name"],
+                            vacancy.get("salary_from"),
+                            vacancy.get("salary_to"),
+                            vacancy["url"]
+                        )
                     )
         conn.commit()
 
@@ -95,14 +98,18 @@ def display_companies_and_vacancies(companies_vacancies):
 
 
 def display_all_vacancies(vacancies):
-    """Отображает все вакансии."""
     print("\nВсе вакансии:")
     for idx, vacancy in enumerate(vacancies, 1):
         salary = "Не указана"
-        if vacancy["salary_from"] or vacancy["salary_to"]:
-            salary_from = f"от {vacancy['salary_from']}" if vacancy["salary_from"] else ""
-            salary_to = f"до {vacancy['salary_to']}" if vacancy["salary_to"] else ""
-            salary = f"{salary_from} {salary_to}".strip()
+        salary_from = vacancy.get("salary_from")
+        salary_to = vacancy.get("salary_to")
+
+        if salary_from and salary_to:
+            salary = f"от {salary_from} до {salary_to}"
+        elif salary_from:
+            salary = f"от {salary_from}"
+        elif salary_to:
+            salary = f"до {salary_to}"
 
         print(f"{idx}. {vacancy['company']} - {vacancy['vacancy']} - {salary} - {vacancy['url']}")
 
@@ -113,15 +120,21 @@ def display_avg_salary(avg_salary):
 
 
 def display_vacancies_with_higher_salary(vacancies):
-    """Отображает вакансии с зарплатой выше средней."""
     print("\nВакансии с зарплатой выше средней:")
     for idx, vacancy in enumerate(vacancies, 1):
-        avg = (vacancy["salary_from"] + vacancy["salary_to"]) / 2 \
-            if vacancy["salary_from"] and vacancy[
-            "salary_to"] \
-            else 0
-        print(f"{idx}. {vacancy['company']} - {vacancy['vacancy']} - {avg:.0f} руб. - {vacancy['url']}")
+        salary_from = vacancy.get("salary_from")
+        salary_to = vacancy.get("salary_to")
 
+        if salary_from and salary_to:
+            avg = (salary_from + salary_to) / 2
+        elif salary_from:
+            avg = salary_from
+        elif salary_to:
+            avg = salary_to
+        else:
+            avg = 0
+
+        print(f"{idx}. {vacancy['company']} - {vacancy['vacancy']} - {avg:.0f} руб. - {vacancy['url']}")
 
 def display_vacancies_with_keyword(vacancies, keyword):
     """Отображает вакансии с ключевым словом."""
