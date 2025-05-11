@@ -11,6 +11,7 @@ def get_employer_info(employer_id):
 
 
 def get_employer_vacancies(employer_id):
+    """Получает список вакансий от работодателей"""
     vacancies = []
     page = 0
     max_vacancies = 100
