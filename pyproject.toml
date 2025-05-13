@@ -8,12 +8,14 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "types-requests (>=2.32.0.20250328,<3.0.0.0)",
-    "types-psycopg2 (>=2.9.21.20250318,<3.0.0.0)"
+    "requests (>=2.32.3,<3.0.0)",
+    "psycopg2-binary (>=2.9.10,<3.0.0)",
+    "pandas (>=2.2.3,<3.0.0)",
+    "python-dotenv (>=1.1.0,<2.0.0)"
 ]
 
 [tool.poetry]
-packages = [{include = "cw_3"}]
+#packages = [{include = "cw_3"}]
 
 
 [build-system]
@@ -25,7 +27,6 @@ python = ">=3.13"
 requests = "^2.32.3"
 pandas = "^2.2.3"
 flake8 = "^7.2.0"
-psycopg2 = "^2.9.10"
 
 [tool.poetry.group.lint.dependencies]
 isort = "^6.0.1"
