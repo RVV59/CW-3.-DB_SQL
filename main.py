@@ -20,7 +20,7 @@ def create_database():
     try:
         cursor.execute(f"CREATE DATABASE {DB_CONFIG['database']};")
     except psycopg2.errors.DuplicateDatabase:
-        pass  # БД уже существует
+        pass
     finally:
         cursor.close()
         conn.close()
@@ -76,19 +76,29 @@ def fill_tables():
 
                 vacancies = get_employer_vacancies(employer_id)
                 for vacancy in vacancies:
+                    employer_data = vacancy.get("employer", {})
+                    employer_id = employer_data.get("id")
+
+                    if not employer_id:
+                        pass
+                        continue
+
+                    salary_data = vacancy.get("salary")
+                    salary_from = salary_data.get("from") if salary_data else None
+                    salary_to = salary_data.get("to") if salary_data else None
+
                     cursor.execute(
                         """INSERT INTO vacancies (employer_id, name, salary_from, salary_to, url)
                            VALUES (%s, %s, %s, %s, %s)""",
                         (
-                            vacancy["employer_id"],
-                            vacancy["name"],
-                            vacancy.get("salary_from"),
-                            vacancy.get("salary_to"),
-                            vacancy["url"]
+                            employer_id,
+                            vacancy.get("name"),
+                            salary_from,
+                            salary_to,
+                            vacancy.get("alternate_url")
                         )
                     )
         conn.commit()
-
 
 def display_companies_and_vacancies(companies_vacancies):
     """Отображает список компаний и количество вакансий."""
@@ -100,19 +110,19 @@ def display_companies_and_vacancies(companies_vacancies):
 def display_all_vacancies(vacancies):
     print("\nВсе вакансии:")
     for idx, vacancy in enumerate(vacancies, 1):
-        salary = "Не указана"
-        salary_from = vacancy.get("salary_from")
-        salary_to = vacancy.get("salary_to")
+        salary_data = vacancy.get("salary", {})
+        salary_from = salary_data.get("from")
+        salary_to = salary_data.get("to")
 
+        salary_text = "Не указана"
         if salary_from and salary_to:
-            salary = f"от {salary_from} до {salary_to}"
+            salary_text = f"от {salary_from} до {salary_to}"
         elif salary_from:
-            salary = f"от {salary_from}"
+            salary_text = f"от {salary_from}"
         elif salary_to:
-            salary = f"до {salary_to}"
+            salary_text = f"до {salary_to}"
 
-        print(f"{idx}. {vacancy['company']} - {vacancy['vacancy']} - {salary} - {vacancy['url']}")
-
+        print(f"{idx}. {vacancy['company']} - {vacancy['vacancy']} - {salary_text} - {vacancy['url']}")
 
 def display_avg_salary(avg_salary):
     """Отображает среднюю зарплату."""
@@ -135,6 +145,18 @@ def display_vacancies_with_higher_salary(vacancies):
             avg = 0
 
         print(f"{idx}. {vacancy['company']} - {vacancy['vacancy']} - {avg:.0f} руб. - {vacancy['url']}")
+
+
+def get_avg_salary(self) -> float:
+    with self.conn.cursor() as cursor:
+        query = """
+        SELECT AVG((salary_from + salary_to) / 2) AS avg_salary
+        FROM vacancies
+        WHERE salary_from IS NOT NULL OR salary_to IS NOT NULL;
+        """
+        cursor.execute(query)
+        result = cursor.fetchone()[0]
+        return result if result is not None else 0.0
 
 def display_vacancies_with_keyword(vacancies, keyword):
     """Отображает вакансии с ключевым словом."""
